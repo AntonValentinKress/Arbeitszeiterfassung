@@ -43,7 +43,7 @@ header h1 {
 
 /* Mainbereich */
 main {
-  margin-bottom: 80px; /* Platz für Footer */
+  margin-bottom: 160px; /* Platz für Footer */
 }
 
 /* Arbeitstag Container */
@@ -87,6 +87,13 @@ main {
   margin-bottom: 5px;
 }
 
+.save-load {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Action Buttons */
 .action-btn {
   display: block;
@@ -102,8 +109,43 @@ main {
   text-align: center;
 }
 
+.action-btn-red {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background-color: #e74c3c;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+  margin-top: 10px;
+  text-align: center;
+}
+.action-btn-grey {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background-color: #909090;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+  margin-top: 10px;
+  text-align: center;
+}
+
 .action-btn:hover {
   background-color: #219150;
+}
+
+.action-btn-red:hover {
+  background-color: #c0392b;
+}
+
+.action-btn-grey:hover {
+  background-color: #707070;
 }
 
 /* Delete Buttons */

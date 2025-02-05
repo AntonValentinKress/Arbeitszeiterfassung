@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Button, um für diesen Tag eine neue Baustelle anzulegen
     const addBaustelleBtn = document.createElement('button');
     addBaustelleBtn.textContent = 'Baustelle hinzufügen';
-    addBaustelleBtn.classList.add('action-btn', 'add-baustelle-btn');
+    addBaustelleBtn.classList.add('action-btn-grey', 'add-baustelle-btn');
     workdayDiv.appendChild(addBaustelleBtn);
 
     // Container für die Baustellen dieses Arbeitstags
@@ -348,13 +348,13 @@ const saveStateBtn = document.createElement('button');
 saveStateBtn.textContent = 'Daten speichern';
 saveStateBtn.classList.add('action-btn');
 saveStateBtn.addEventListener('click', saveState);
-document.querySelector('main').appendChild(saveStateBtn);
+document.querySelector('saveload').appendChild(saveStateBtn);
 
 const clearStateBtn = document.createElement('button');
-clearStateBtn.textContent = 'Gespeicherte Daten löschen';
-clearStateBtn.classList.add('action-btn');
+clearStateBtn.textContent = 'Daten löschen';
+clearStateBtn.classList.add('action-btn-red');
 clearStateBtn.addEventListener('click', clearState);
-document.querySelector('main').appendChild(clearStateBtn);
+document.querySelector('saveload').appendChild(clearStateBtn);
 
 // Lade den Zustand beim Seitenstart
 loadState();
