@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arbeitszeiterfassung</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <!-- jsPDF über CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Arbeitszeiterfassung</h1>
+  </header>
+  <main>
+    <!-- Container für die dynamisch erstellten Arbeitstage -->
+    <div id="workdays-container"></div>
+    <button id="add-workday" class="action-btn">Neuen Arbeitstag hinzufügen</button>
+  </main>
+  <footer>
+    <button id="generate-pdf" class="action-btn">PDF erstellen &amp; Teilen</button>
+  </footer>
+  <script src="assets/script.js"></script>
+</body>
+</html>

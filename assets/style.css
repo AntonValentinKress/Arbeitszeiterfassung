@@ -1,0 +1,108 @@
+/* Basis-Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7f8;
+    color: #333;
+    line-height: 1.6;
+    padding: 10px;
+  }
+  
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  header h1 {
+    font-size: 1.8em;
+    color: #2c3e50;
+  }
+  
+  /* Mainbereich */
+  main {
+    margin-bottom: 20px;
+  }
+  
+  /* Arbeitstag Container */
+  .workday {
+    background: #fff;
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+  }
+  
+  .workday label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  
+  .workday input[type="text"],
+  .workday input[type="number"],
+  .workday input[type="date"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+  }
+  
+  /* Baustelle Einträge */
+  .baustelle {
+    background: #ecf0f1;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 3px;
+  }
+  
+  .baustelle label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  /* Action Buttons */
+  .action-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #27ae60;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  .action-btn:hover {
+    background-color: #219150;
+  }
+  
+  /* Footer */
+  footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    background: #fff;
+    box-shadow: 0 -2px 3px rgba(0,0,0,0.1);
+  }
+  
+  /* Responsive Anpassungen */
+  @media (min-width: 600px) {
+    .action-btn {
+      width: auto;
+      margin: 10px auto;
+      display: block;
+    }
+  }
+  
