@@ -39,6 +39,17 @@ document.addEventListener('DOMContentLoaded', function() {
     pausenLabel.appendChild(pausenInput);
     workdayDiv.appendChild(pausenLabel);
 
+    // Fahrtzeit pro Arbeitstag
+    const fahrtzeitLabel = document.createElement('label');
+    fahrtzeitLabel.textContent = 'Fahrtzeit (Min):';
+    const fahrtzeitInput = document.createElement('input');
+    fahrtzeitInput.type = 'number';
+    fahrtzeitInput.placeholder = 'Minuten';
+    fahrtzeitInput.min = "0";
+    fahrtzeitInput.classList.add('workday-fahrtzeit');
+    fahrtzeitLabel.appendChild(fahrtzeitInput)
+    workdayDiv.appendChild(fahrtzeitLabel);
+
     // Löschen-Button für den Arbeitstag
     const deleteWorkdayBtn = document.createElement('button');
     deleteWorkdayBtn.textContent = 'Arbeitstag löschen';
@@ -133,14 +144,26 @@ document.addEventListener('DOMContentLoaded', function() {
       doc.text('Keine Daten vorhanden.', 10, y);
     }
 
-    workdayDivs.forEach((workday, dayIndex) => {
+    workdayDivs.forEach((workday) => {
       // Hole Datum und Pausenzeit
       const dateVal = workday.querySelector('.workday-date').value || 'Kein Datum';
       const pausenVal = workday.querySelector('.workday-pausen').value || '0';
+      const fahrtzeitVal = workday.querySelector('.workday-fahrtzeit').value || '0';
+
+      // Wochentage als Liste
+      const weekdayList = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+      const date = new Date(dateVal);
+      let weekdayVal = weekdayList[date.getDay()];
+
+      // Datum formatieren
+      let day = date.getDate().toString().padStart(2, '0');
+      let month = (date.getMonth() + 1).toString().padStart(2, '0');
+      let year = date.getFullYear().toString().padStart(2, '0');
+      let formattedDate = `${day}.${month}.${year}`;
 
       // Überschrift pro Arbeitstag
       doc.setFontSize(12);
-      doc.text(`Arbeitstag ${dayIndex + 1}: Datum: ${dateVal} | Pausen: ${pausenVal} Min`, 10, y);
+      doc.text(`${weekdayVal} (${formattedDate}): Pausen: ${pausenVal} Min | Fahrtzeit: ${fahrtzeitVal} Min` , 10, y);
       y += 6;
 
       // Sammle alle Baustellen dieses Arbeitstages
@@ -199,6 +222,7 @@ function saveState() {
   workdayDivs.forEach(workday => {
     const date = workday.querySelector('.workday-date').value;
     const pausen = workday.querySelector('.workday-pausen').value;
+    const fahrtzeit = workday.querySelector('.workday-fahrtzeit').value;
     
     // Erfasse alle Baustellen des aktuellen Arbeitstages
     const baustellen = [];
@@ -208,7 +232,7 @@ function saveState() {
       baustellen.push({ name, arbeitszeit });
     });
     
-    workdays.push({ date, pausen, baustellen });
+    workdays.push({ date, pausen, fahrtzeit, baustellen });
   });
   
   // Den Namen zusätzlich speichern
@@ -262,6 +286,18 @@ function loadState() {
     pausenInput.value = day.pausen;
     pausenLabel.appendChild(pausenInput);
     workdayDiv.appendChild(pausenLabel);
+
+    // Fahrtzeiteingabe
+    const fahrtzeitLabel = document.createElement('label');
+    fahrtzeitLabel.textContent = 'Fahrtzeit (Min):';
+    const fahrtzeitInput = document.createElement('input');
+    fahrtzeitInput.type = 'number';
+    fahrtzeitInput.placeholder = 'Minuten';
+    fahrtzeitInput.min = '0';
+    fahrtzeitInput.classList.add('workday-fahrtzeit');
+    fahrtzeitInput.value = day.fahrtzeit;
+    fahrtzeitLabel.appendChild(fahrtzeitInput);
+    workdayDiv.appendChild(fahrtzeitLabel);
     
     // Löschen-Button für den Arbeitstag
     const deleteWorkdayBtn = document.createElement('button');
