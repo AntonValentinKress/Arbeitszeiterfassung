@@ -193,7 +193,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Funktion, um den aktuellen Zustand zu speichern
 function saveState() {
-  // Sammle alle Arbeitstage in einem Array
   const workdays = [];
   const workdayDivs = document.querySelectorAll('.workday');
   
@@ -201,7 +200,7 @@ function saveState() {
     const date = workday.querySelector('.workday-date').value;
     const pausen = workday.querySelector('.workday-pausen').value;
     
-    // Sammle alle Baustellen des Arbeitstages
+    // Erfasse alle Baustellen des aktuellen Arbeitstages
     const baustellen = [];
     workday.querySelectorAll('.baustelle').forEach(baustelle => {
       const name = baustelle.querySelector('.baustelle-name').value;
@@ -212,18 +211,20 @@ function saveState() {
     workdays.push({ date, pausen, baustellen });
   });
   
-  // Zusätzlich den Nutzernamen speichern
+  // Den Namen zusätzlich speichern
   const userName = document.getElementById('user-name').value;
-  
   const state = { userName, workdays };
   
-  // Speichern als JSON-String
   localStorage.setItem('arbeitszeitState', JSON.stringify(state));
   alert('Daten gespeichert.');
 }
 
 // Funktion, um den Zustand wiederherzustellen
+// Funktion, um den Zustand wiederherzustellen
 function loadState() {
+  // Hole den Container für Arbeitstage
+  const workdaysContainer = document.getElementById('workdays-container');
+  
   const stateJSON = localStorage.getItem('arbeitszeitState');
   if (!stateJSON) return;
   
@@ -232,12 +233,11 @@ function loadState() {
   // Setze den Nutzernamen
   document.getElementById('user-name').value = state.userName || '';
   
-  // Leere zuerst den Container
+  // Leere zuerst den Container für Arbeitstage
   workdaysContainer.innerHTML = '';
   
   // Erstelle Arbeitstage neu
   state.workdays.forEach(day => {
-    // Erstelle einen neuen Arbeitstag
     const workdayDiv = document.createElement('div');
     workdayDiv.classList.add('workday');
     
@@ -283,14 +283,13 @@ function loadState() {
     baustellenContainer.classList.add('baustellen-container');
     workdayDiv.appendChild(baustellenContainer);
     
-    // Event, um Baustellen hinzuzufügen
+    // Event, um weitere Baustellen hinzuzufügen
     addBaustelleBtn.addEventListener('click', function() {
       addBaustelle(baustellenContainer);
     });
     
-    // Erstelle bestehende Baustellen
+    // Erstelle vorhandene Baustellen
     day.baustellen.forEach(bs => {
-      // Erstelle eine neue Baustelle
       const baustelleDiv = document.createElement('div');
       baustelleDiv.classList.add('baustelle');
       
@@ -331,6 +330,7 @@ function loadState() {
     workdaysContainer.appendChild(workdayDiv);
   });
 }
+
 
 // Funktion, um den gespeicherten Zustand zu löschen
 function clearState() {
