@@ -334,8 +334,13 @@ function loadState() {
 
 // Funktion, um den gespeicherten Zustand zu löschen
 function clearState() {
-  localStorage.removeItem('arbeitszeitState');
-  alert('Gespeicherte Daten wurden gelöscht.');
+  if (confirm("Möchtest du die Daten wirklich löschen?")) {
+    localStorage.removeItem('arbeitszeitState');
+    alert('Gespeicherte Daten wurden gelöscht.');
+  } else {
+      // User clicked "No" (Cancel)
+      console.log("Daten wurden nicht gelöscht!");
+  }
 }
 
 // Buttons zum Speichern und Löschen des Zustands hinzufügen
