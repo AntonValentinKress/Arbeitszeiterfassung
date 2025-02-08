@@ -4,7 +4,7 @@ Die Webseite ermöglicht das digitale Erfassen und Teilen von Arbeitszeiten. Die
 > Das Projekt wurde ausschließlich als *Proof of Concept* erstellt. Ein Großteil der Webseite wurde mithilfe einer KI generiert.
 
 > [!NOTE]  
-> Die Webseite wurde in erster Linie für die Verwendung mit dem Handy erstellt. Auf größeren Bildschirmen kann die Formatierung evtl. leicht zerbreichen. Die Funktion sollte allerdings dennoch gegeben sein.
+> Die Webseite wurde in erster Linie für die Verwendung mit dem Handy erstellt. Auf größeren Bildschirmen kann die Formatierung evtl. leicht zerbrechen. Die Funktion sollte allerdings dennoch gegeben sein.
 ---
 ## Datenerfassung
 Der Nutzer kann **Arbeitstage** und **Baustellen** einpflegen:
