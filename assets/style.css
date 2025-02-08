@@ -56,6 +56,41 @@ main {
   position: relative;
 }
 
+/* Neuer Bereich: Arbeitstag Header */
+.workday-header {
+  display: flex;
+  align-items: center;
+  background-color: #f8f9fa;
+  padding: 8px 10px;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 10px;
+}
+
+/* Toggle-Button im Header */
+.toggle-btn {
+  background: none;
+  border: none;
+  font-size: 1.2em;
+  cursor: pointer;
+  margin-right: 10px;
+  color: #333;
+}
+
+/* Anzeige des Datums im Header */
+.header-date {
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #2c3e50;
+}
+
+/* Inhalt des Arbeitstags */
+.workday-content {
+  padding: 10px;
+  /* Optional: sanfte Übergänge beim Ein-/Ausblenden */
+  transition: max-height 0.3s ease-in-out;
+}
+
+/* Labels und Eingabefelder im Arbeitstag */
 .workday label {
   display: block;
   margin-bottom: 10px;
@@ -87,6 +122,7 @@ main {
   margin-bottom: 5px;
 }
 
+/* Save / Load Bereich */
 .save-load {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -122,6 +158,7 @@ main {
   margin-top: 10px;
   text-align: center;
 }
+
 .action-btn-grey {
   display: block;
   width: 100%;
@@ -165,6 +202,55 @@ main {
 .delete-btn:hover {
   background-color: #c0392b;
 }
+
+.save-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #27ae60; /* Grüner Hintergrund */
+  color: #fff;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2em;
+  opacity: 0;
+  transform: scale(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 1000;
+}
+
+.save-notification.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.clear-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #e74c3c; /* Roter Hintergrund */
+  color: #fff;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2em;
+  opacity: 0;
+  transform: scale(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 1000;
+}
+
+.clear-notification.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
 
 /* Footer */
 footer {

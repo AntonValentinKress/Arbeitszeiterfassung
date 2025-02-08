@@ -3,9 +3,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const addWorkdayBtn = document.getElementById('add-workday');
   const generatePdfBtn = document.getElementById('generate-pdf');
 
-  // Beim Klick auf "Neuen Arbeitstag hinzufügen"
+  // Beim Klick auf "Neuen Arbeitstag hinzufügen" (neu erstellte Tage sind standardmäßig ausgeklappt)
   addWorkdayBtn.addEventListener('click', function() {
-    addWorkday();
+    addWorkday(false); // false → nicht zusammengeklappt (ausgeklappt)
   });
 
   // Beim Klick auf "PDF erstellen & Teilen"
@@ -15,13 +15,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Funktion: Erstelle ein PDF aus den eingetragenen Daten und teile es
   async function generatePDF() {
-    // Hole den Nutzernamen
     const userName = document.getElementById('user-name').value || 'Unbekannt';
-
-    // Erstelle ein PDF mit jsPDF
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    let y = 10; // vertikale Position
+    let y = 10;
 
     // Titel und Nutzername
     doc.setFontSize(16);
@@ -31,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
     doc.text(`Name: ${userName}`, 10, y);
     y += 10;
 
-    // Sammle alle Arbeitstage
+    // Alle Arbeitstage durchgehen
     const workdayDivs = document.querySelectorAll('.workday');
 
     if (workdayDivs.length === 0) {
@@ -39,43 +36,30 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     workdayDivs.forEach((workday) => {
-      // Hole Datum und Pausenzeit
+      // Hole Datum und Pausen-/Fahrtzeiten aus dem Inhalt (workday-content)
       const dateVal = workday.querySelector('.workday-date').value || 'Kein Datum';
       const pausenVal = workday.querySelector('.workday-pausen').value || '0';
       const fahrtzeitVal = workday.querySelector('.workday-fahrtzeit').value || '0';
 
-      // Wochentage als Liste
-      const weekdayList = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
-      const date = new Date(dateVal);
-      let weekdayVal = weekdayList[date.getDay()];
-
-      // Datum formatieren
-      let day = date.getDate().toString().padStart(2, '0');
-      let month = (date.getMonth() + 1).toString().padStart(2, '0');
-      let year = date.getFullYear().toString().padStart(2, '0');
-      let formattedDate = `${day}.${month}.${year}`;
+      let formattedDateVal = formatDate(dateVal);
+      let weekdayDateVal = weekdayDate(dateVal);
 
       // Überschrift pro Arbeitstag
       doc.setFontSize(12);
-      doc.text(`${weekdayVal} (${formattedDate}): Pausen: ${pausenVal} Min | Fahrtzeit: ${fahrtzeitVal} Min` , 10, y);
+      doc.text(`${weekdayDateVal} (${formattedDateVal}): Pausen: ${pausenVal} Min | Fahrtzeit: ${fahrtzeitVal} Min`, 10, y);
       y += 6;
 
-      // Sammle alle Baustellen dieses Arbeitstages
+      // Alle Baustellen dieses Tages
       const baustellen = workday.querySelectorAll('.baustelle');
       const tableRows = [];
-
-      baustellen.forEach((baustelle, bIndex) => {
+      baustellen.forEach((baustelle) => {
         const baustelleName = baustelle.querySelector('.baustelle-name').value || 'Keine Angabe';
         const arbeitszeit = baustelle.querySelector('.baustelle-arbeitszeit').value || '0';
         tableRows.push([baustelleName, arbeitszeit + ' h']);
       });
-
-      // Wenn keine Baustelle vorhanden ist, einen Hinweis einfügen
       if (tableRows.length === 0) {
         tableRows.push(['Keine Baustelle', '']);
       }
-
-      // Verwende AutoTable für tabellarische Darstellung
       doc.autoTable({
         startY: y,
         head: [['Baustelle', 'Arbeitszeit']],
@@ -84,13 +68,12 @@ document.addEventListener('DOMContentLoaded', function() {
         styles: { fontSize: 10 },
         headStyles: { fillColor: [39, 174, 96] }
       });
-      y = doc.lastAutoTable.finalY + 10; // Abstand für den nächsten Arbeitstag
+      y = doc.lastAutoTable.finalY + 10;
     });
 
-    // Erstelle einen Blob aus dem PDF
+    // PDF-Blob erstellen
     const pdfBlob = doc.output('blob');
 
-    // Überprüfe, ob die Web Share API unterstützt wird und das Teilen von Dateien möglich ist
     if (navigator.canShare && navigator.canShare({ files: [new File([pdfBlob], 'arbeitszeiterfassung.pdf', { type: 'application/pdf' })] })) {
       try {
         await navigator.share({
@@ -102,28 +85,55 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Teilen fehlgeschlagen:', error);
       }
     } else {
-      // Fallback: PDF wird heruntergeladen
       doc.save('arbeitszeiterfassung.pdf');
     }
   }
 });
 
 // Funktion: Neuen Arbeitstag erstellen
-function addWorkday() {
-  // Container für den Arbeitstag
+// Parameter "collapsed" gibt an, ob der Tag initial zusammengeklappt sein soll.
+function addWorkday(collapsed = false) {
+  const workdaysContainer = document.getElementById('workdays-container');
+
   const workdayDiv = document.createElement('div');
   workdayDiv.classList.add('workday');
 
-  // Datumseingabe für den Arbeitstag
+  // Erstelle den Header, der den Toggle-Button und die Datum-Anzeige enthält
+  const headerDiv = document.createElement('div');
+  headerDiv.classList.add('workday-header');
+
+  const toggleBtn = document.createElement('button');
+  toggleBtn.classList.add('toggle-btn');
+  // Bei neuen Arbeitstagen (collapsed = false) ist der Inhalt sichtbar → "▼"
+  toggleBtn.textContent = collapsed ? '►' : '▼';
+  headerDiv.appendChild(toggleBtn);
+
+  const headerDateSpan = document.createElement('span');
+  headerDateSpan.classList.add('header-date');
+  headerDateSpan.textContent = 'Neuer Arbeitstag';
+  headerDiv.appendChild(headerDateSpan);
+
+  workdayDiv.appendChild(headerDiv);
+
+  // Erstelle den Content-Bereich (alle Eingabefelder etc.)
+  const contentDiv = document.createElement('div');
+  contentDiv.classList.add('workday-content');
+
+  // Datumseingabe
   const dateLabel = document.createElement('label');
   dateLabel.textContent = 'Datum:';
   const dateInput = document.createElement('input');
   dateInput.type = 'date';
   dateInput.classList.add('workday-date');
   dateLabel.appendChild(dateInput);
-  workdayDiv.appendChild(dateLabel);
+  contentDiv.appendChild(dateLabel);
 
-  // Pauseneingabe pro Arbeitstag
+  // Aktualisiere die Headeranzeige, wenn sich der Datumseintrag ändert
+  dateInput.addEventListener('change', function() {
+    headerDateSpan.textContent = formatDate(dateInput.value) || 'Neuer Arbeitstag';
+  });
+
+  // Pauseneingabe
   const pausenLabel = document.createElement('label');
   pausenLabel.textContent = 'Pausen (Min):';
   const pausenInput = document.createElement('input');
@@ -132,9 +142,9 @@ function addWorkday() {
   pausenInput.min = "0";
   pausenInput.classList.add('workday-pausen');
   pausenLabel.appendChild(pausenInput);
-  workdayDiv.appendChild(pausenLabel);
+  contentDiv.appendChild(pausenLabel);
 
-  // Fahrtzeit pro Arbeitstag
+  // Fahrtzeiteingabe
   const fahrtzeitLabel = document.createElement('label');
   fahrtzeitLabel.textContent = 'Fahrtzeit (Min):';
   const fahrtzeitInput = document.createElement('input');
@@ -142,8 +152,8 @@ function addWorkday() {
   fahrtzeitInput.placeholder = 'Minuten';
   fahrtzeitInput.min = "0";
   fahrtzeitInput.classList.add('workday-fahrtzeit');
-  fahrtzeitLabel.appendChild(fahrtzeitInput)
-  workdayDiv.appendChild(fahrtzeitLabel);
+  fahrtzeitLabel.appendChild(fahrtzeitInput);
+  contentDiv.appendChild(fahrtzeitLabel);
 
   // Löschen-Button für den Arbeitstag
   const deleteWorkdayBtn = document.createElement('button');
@@ -152,25 +162,39 @@ function addWorkday() {
   deleteWorkdayBtn.addEventListener('click', function() {
     workdayDiv.remove();
   });
-  workdayDiv.appendChild(deleteWorkdayBtn);
+  contentDiv.appendChild(deleteWorkdayBtn);
 
-  // Button, um für diesen Tag eine neue Baustelle anzulegen
+  // Button zum Hinzufügen einer Baustelle
   const addBaustelleBtn = document.createElement('button');
   addBaustelleBtn.textContent = 'Baustelle hinzufügen';
   addBaustelleBtn.classList.add('action-btn-grey', 'add-baustelle-btn');
-  workdayDiv.appendChild(addBaustelleBtn);
+  contentDiv.appendChild(addBaustelleBtn);
 
-  // Container für die Baustellen dieses Arbeitstags
+  // Container für Baustellen
   const baustellenContainer = document.createElement('div');
   baustellenContainer.classList.add('baustellen-container');
-  workdayDiv.appendChild(baustellenContainer);
+  contentDiv.appendChild(baustellenContainer);
 
-  // Event: Beim Klick auf den Button wird eine neue Baustelle hinzugefügt
   addBaustelleBtn.addEventListener('click', function() {
     addBaustelle(baustellenContainer);
   });
 
-  // Füge den neuen Arbeitstag dem Hauptcontainer hinzu
+  workdayDiv.appendChild(contentDiv);
+
+  // Setze den anfänglichen Status (ausgeklappt oder zusammengeklappt)
+  contentDiv.style.display = collapsed ? 'none' : '';
+  
+  // Toggle-Funktionalität: Beim Klick auf den Toggle-Button wird der Content ein- bzw. ausgeblendet.
+  toggleBtn.addEventListener('click', function() {
+    if(contentDiv.style.display === 'none'){
+      contentDiv.style.display = '';
+      toggleBtn.textContent = '▼';
+    } else {
+      contentDiv.style.display = 'none';
+      toggleBtn.textContent = '►';
+    }
+  });
+
   workdaysContainer.appendChild(workdayDiv);
 }
 
@@ -179,7 +203,6 @@ function addBaustelle(container) {
   const baustelleDiv = document.createElement('div');
   baustelleDiv.classList.add('baustelle');
 
-  // Eingabefeld für den Baustellennamen
   const nameLabel = document.createElement('label');
   nameLabel.textContent = 'Baustelle:';
   const nameInput = document.createElement('input');
@@ -189,7 +212,6 @@ function addBaustelle(container) {
   nameLabel.appendChild(nameInput);
   baustelleDiv.appendChild(nameLabel);
 
-  // Eingabefeld für die Arbeitszeit
   const arbeitszeitLabel = document.createElement('label');
   arbeitszeitLabel.textContent = 'Arbeitszeit (h):';
   const arbeitszeitInput = document.createElement('input');
@@ -201,7 +223,6 @@ function addBaustelle(container) {
   arbeitszeitLabel.appendChild(arbeitszeitInput);
   baustelleDiv.appendChild(arbeitszeitLabel);
 
-  // Löschen-Button für die Baustelle
   const deleteBaustelleBtn = document.createElement('button');
   deleteBaustelleBtn.textContent = 'Baustelle löschen';
   deleteBaustelleBtn.classList.add('delete-btn');
@@ -210,10 +231,10 @@ function addBaustelle(container) {
   });
   baustelleDiv.appendChild(deleteBaustelleBtn);
 
-  // Füge den Baustellen-Eintrag in den Container ein
   container.appendChild(baustelleDiv);
 }
 
+// Funktion, um den aktuellen Zustand zu speichern
 // Funktion, um den aktuellen Zustand zu speichern
 function saveState() {
   const workdays = [];
@@ -224,7 +245,6 @@ function saveState() {
     const pausen = workday.querySelector('.workday-pausen').value;
     const fahrtzeit = workday.querySelector('.workday-fahrtzeit').value;
     
-    // Erfasse alle Baustellen des aktuellen Arbeitstages
     const baustellen = [];
     workday.querySelectorAll('.baustelle').forEach(baustelle => {
       const name = baustelle.querySelector('.baustelle-name').value;
@@ -235,36 +255,75 @@ function saveState() {
     workdays.push({ date, pausen, fahrtzeit, baustellen });
   });
   
-  // Den Namen zusätzlich speichern
   const userName = document.getElementById('user-name').value;
   const state = { userName, workdays };
   
   localStorage.setItem('arbeitszeitState', JSON.stringify(state));
-  alert('Daten gespeichert.');
+  
+  // Statt eines Alerts: Zeige eine kurze Animation (weißer Haken in grünem Kreis)
+  showSaveNotification();
 }
 
-// Funktion, um den Zustand wiederherzustellen
-// Funktion, um den Zustand wiederherzustellen
-function loadState() {
-  // Hole den Container für Arbeitstage
-  const workdaysContainer = document.getElementById('workdays-container');
+// Hilfsfunktion zur Anzeige der Bestätigung
+function showSaveNotification() {
+  // Erstelle das Notification-Element
+  const notification = document.createElement('div');
+  notification.classList.add('save-notification');
+  // Verwende das Unicode-Zeichen für einen Haken (✓)
+  notification.innerHTML = '&#10004;';
   
+  // Füge das Element zum Body hinzu
+  document.body.appendChild(notification);
+  
+  // Nutze requestAnimationFrame, um sicherzustellen, dass die CSS-Transition greift
+  requestAnimationFrame(() => {
+    notification.classList.add('show');
+  });
+  
+  // Nach 1 Sekunde die Animation umkehren und das Element entfernen
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => {
+      notification.remove();
+    }, 300); // Wartezeit, bis die Transition abgeschlossen ist
+  }, 1000);
+}
+
+
+// Funktion, um den Zustand wiederherzustellen (geladene Tage sind standardmäßig zusammengeklappt)
+function loadState() {
+  const workdaysContainer = document.getElementById('workdays-container');
   const stateJSON = localStorage.getItem('arbeitszeitState');
   if (!stateJSON) return;
   
   const state = JSON.parse(stateJSON);
-  
-  // Setze den Nutzernamen
   document.getElementById('user-name').value = state.userName || '';
-  
-  // Leere zuerst den Container für Arbeitstage
   workdaysContainer.innerHTML = '';
   
-  // Erstelle Arbeitstage neu
   state.workdays.forEach(day => {
     const workdayDiv = document.createElement('div');
     workdayDiv.classList.add('workday');
-    
+
+    // Header mit Toggle-Button und Datum
+    const headerDiv = document.createElement('div');
+    headerDiv.classList.add('workday-header');
+
+    const toggleBtn = document.createElement('button');
+    toggleBtn.classList.add('toggle-btn');
+    // Geladene Arbeitstage sollen zusammengeklappt sein → "►"
+    toggleBtn.textContent = '►';
+    headerDiv.appendChild(toggleBtn);
+
+    const headerDateSpan = document.createElement('span');
+    headerDateSpan.classList.add('header-date');
+    headerDateSpan.textContent = formatDate(day.date) || 'Arbeitstag';
+    headerDiv.appendChild(headerDateSpan);
+    workdayDiv.appendChild(headerDiv);
+
+    // Content-Bereich erstellen
+    const contentDiv = document.createElement('div');
+    contentDiv.classList.add('workday-content');
+
     // Datumseingabe
     const dateLabel = document.createElement('label');
     dateLabel.textContent = 'Datum:';
@@ -273,8 +332,12 @@ function loadState() {
     dateInput.classList.add('workday-date');
     dateInput.value = day.date;
     dateLabel.appendChild(dateInput);
-    workdayDiv.appendChild(dateLabel);
-    
+    contentDiv.appendChild(dateLabel);
+
+    dateInput.addEventListener('change', function() {
+      headerDateSpan.textContent = formatDate(dateInput.value) || 'Arbeitstag';
+    });
+
     // Pauseneingabe
     const pausenLabel = document.createElement('label');
     pausenLabel.textContent = 'Pausen (Min):';
@@ -285,7 +348,7 @@ function loadState() {
     pausenInput.classList.add('workday-pausen');
     pausenInput.value = day.pausen;
     pausenLabel.appendChild(pausenInput);
-    workdayDiv.appendChild(pausenLabel);
+    contentDiv.appendChild(pausenLabel);
 
     // Fahrtzeiteingabe
     const fahrtzeitLabel = document.createElement('label');
@@ -293,12 +356,12 @@ function loadState() {
     const fahrtzeitInput = document.createElement('input');
     fahrtzeitInput.type = 'number';
     fahrtzeitInput.placeholder = 'Minuten';
-    fahrtzeitInput.min = '0';
+    fahrtzeitInput.min = "0";
     fahrtzeitInput.classList.add('workday-fahrtzeit');
     fahrtzeitInput.value = day.fahrtzeit;
     fahrtzeitLabel.appendChild(fahrtzeitInput);
-    workdayDiv.appendChild(fahrtzeitLabel);
-    
+    contentDiv.appendChild(fahrtzeitLabel);
+
     // Löschen-Button für den Arbeitstag
     const deleteWorkdayBtn = document.createElement('button');
     deleteWorkdayBtn.textContent = 'Arbeitstag löschen';
@@ -306,29 +369,28 @@ function loadState() {
     deleteWorkdayBtn.addEventListener('click', function() {
       workdayDiv.remove();
     });
-    workdayDiv.appendChild(deleteWorkdayBtn);
-    
-    // Button zum Hinzufügen einer Baustelle
+    contentDiv.appendChild(deleteWorkdayBtn);
+
+    // Baustelle hinzufügen Button
     const addBaustelleBtn = document.createElement('button');
     addBaustelleBtn.textContent = 'Baustelle hinzufügen';
     addBaustelleBtn.classList.add('action-btn-grey', 'add-baustelle-btn');
-    workdayDiv.appendChild(addBaustelleBtn);
-    
-    // Container für Baustellen
+    contentDiv.appendChild(addBaustelleBtn);
+
+    // Baustellen-Container
     const baustellenContainer = document.createElement('div');
     baustellenContainer.classList.add('baustellen-container');
-    workdayDiv.appendChild(baustellenContainer);
-    
-    // Event, um weitere Baustellen hinzuzufügen
+    contentDiv.appendChild(baustellenContainer);
+
     addBaustelleBtn.addEventListener('click', function() {
       addBaustelle(baustellenContainer);
     });
-    
-    // Erstelle vorhandene Baustellen
+
+    // Bestehende Baustellen hinzufügen
     day.baustellen.forEach(bs => {
       const baustelleDiv = document.createElement('div');
       baustelleDiv.classList.add('baustelle');
-      
+
       const nameLabel = document.createElement('label');
       nameLabel.textContent = 'Baustelle:';
       const nameInput = document.createElement('input');
@@ -338,7 +400,7 @@ function loadState() {
       nameInput.value = bs.name;
       nameLabel.appendChild(nameInput);
       baustelleDiv.appendChild(nameLabel);
-      
+
       const arbeitszeitLabel = document.createElement('label');
       arbeitszeitLabel.textContent = 'Arbeitszeit (h):';
       const arbeitszeitInput = document.createElement('input');
@@ -350,8 +412,7 @@ function loadState() {
       arbeitszeitInput.value = bs.arbeitszeit;
       arbeitszeitLabel.appendChild(arbeitszeitInput);
       baustelleDiv.appendChild(arbeitszeitLabel);
-      
-      // Löschen-Button für die Baustelle
+
       const deleteBaustelleBtn = document.createElement('button');
       deleteBaustelleBtn.textContent = 'Baustelle löschen';
       deleteBaustelleBtn.classList.add('delete-btn');
@@ -359,25 +420,85 @@ function loadState() {
         baustelleDiv.remove();
       });
       baustelleDiv.appendChild(deleteBaustelleBtn);
-      
+
       baustellenContainer.appendChild(baustelleDiv);
     });
-    
+
+    workdayDiv.appendChild(contentDiv);
+    // Geladene Arbeitstage standardmäßig zusammengeklappt
+    contentDiv.style.display = 'none';
+
+    toggleBtn.addEventListener('click', function() {
+      if(contentDiv.style.display === 'none'){
+        contentDiv.style.display = '';
+        toggleBtn.textContent = '▼';
+      } else {
+        contentDiv.style.display = 'none';
+        toggleBtn.textContent = '►';
+      }
+    });
+
     workdaysContainer.appendChild(workdayDiv);
   });
 }
-
 
 // Funktion, um den gespeicherten Zustand zu löschen
 function clearState() {
   if (confirm("Möchtest du die Daten wirklich löschen?")) {
     localStorage.removeItem('arbeitszeitState');
-    alert('Gespeicherte Daten wurden gelöscht.');
+    showClearNotification();
   } else {
-      // User clicked "No" (Cancel)
-      console.log("Daten wurden nicht gelöscht!");
+    console.log("Daten wurden nicht gelöscht!");
   }
 }
+
+function formatDate(date) {
+  // Datum formatieren
+  const datum = new Date(date);
+
+  let day = datum.getDate().toString().padStart(2, '0');
+  let month = (datum.getMonth() + 1).toString().padStart(2, '0');
+  let year = datum.getFullYear().toString().padStart(2, '0');
+
+  let formattedDate = `${day}.${month}.${year}`;
+
+  return formattedDate
+}
+
+function weekdayDate(date) {
+  const weekdayList = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+  const datum = new Date(date);
+
+  let weekdayVal = weekdayList[datum.getDay()];
+
+  return weekdayVal
+}
+
+// Hilfsfunktion zur Anzeige der Löschbestätigung
+function showClearNotification() {
+  // Erstelle das Notification-Element
+  const notification = document.createElement('div');
+  notification.classList.add('clear-notification');
+  // Unicode-Zeichen für ein Kreuz (✖)
+  notification.innerHTML = '&#10006;';
+  
+  // Füge das Element zum Body hinzu
+  document.body.appendChild(notification);
+  
+  // Stelle sicher, dass die CSS-Transition greift
+  requestAnimationFrame(() => {
+    notification.classList.add('show');
+  });
+  
+  // Nach 1 Sekunde wieder ausblenden und entfernen
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => {
+      notification.remove();
+    }, 300); // Übergangszeit
+  }, 1000);
+}
+
 
 // Buttons zum Speichern und Löschen des Zustands hinzufügen
 const saveStateBtn = document.createElement('button');
