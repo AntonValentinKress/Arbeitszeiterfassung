@@ -2,6 +2,7 @@
 Die Webseite ermöglicht das digitale Erfassen und Teilen von Arbeitszeiten. Diese werden lokal im Browser (im `localStorage`) gespeichert und beim erneuten Aufrufen der Seite geladen. Der Nutzer kann den Speicher über einen Button löschen, um die vollständige Kontrolle über seine Daten zu behalten.
 > [!IMPORTANT] 
 > Das Projekt wurde ausschließlich als *Proof of Concept* erstellt. Ein Großteil der Webseite wurde mithilfe einer KI generiert.
+
 > [!NOTE]  
 > Die Webseite wurde in erster Linie für die Verwendung mit dem Handy erstellt. Auf größeren Bildschirmen kann die Formatierung evtl. leicht zerbreichen. Die Funktion sollte allerdings dennoch gegeben sein.
 ---
