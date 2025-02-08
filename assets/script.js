@@ -13,112 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
     generatePDF();
   });
 
-  // Funktion: Neuen Arbeitstag erstellen
-  function addWorkday() {
-    // Container für den Arbeitstag
-    const workdayDiv = document.createElement('div');
-    workdayDiv.classList.add('workday');
-
-    // Datumseingabe für den Arbeitstag
-    const dateLabel = document.createElement('label');
-    dateLabel.textContent = 'Datum:';
-    const dateInput = document.createElement('input');
-    dateInput.type = 'date';
-    dateInput.classList.add('workday-date');
-    dateLabel.appendChild(dateInput);
-    workdayDiv.appendChild(dateLabel);
-
-    // Pauseneingabe pro Arbeitstag
-    const pausenLabel = document.createElement('label');
-    pausenLabel.textContent = 'Pausen (Min):';
-    const pausenInput = document.createElement('input');
-    pausenInput.type = 'number';
-    pausenInput.placeholder = 'Minuten';
-    pausenInput.min = "0";
-    pausenInput.classList.add('workday-pausen');
-    pausenLabel.appendChild(pausenInput);
-    workdayDiv.appendChild(pausenLabel);
-
-    // Fahrtzeit pro Arbeitstag
-    const fahrtzeitLabel = document.createElement('label');
-    fahrtzeitLabel.textContent = 'Fahrtzeit (Min):';
-    const fahrtzeitInput = document.createElement('input');
-    fahrtzeitInput.type = 'number';
-    fahrtzeitInput.placeholder = 'Minuten';
-    fahrtzeitInput.min = "0";
-    fahrtzeitInput.classList.add('workday-fahrtzeit');
-    fahrtzeitLabel.appendChild(fahrtzeitInput)
-    workdayDiv.appendChild(fahrtzeitLabel);
-
-    // Löschen-Button für den Arbeitstag
-    const deleteWorkdayBtn = document.createElement('button');
-    deleteWorkdayBtn.textContent = 'Arbeitstag löschen';
-    deleteWorkdayBtn.classList.add('delete-btn');
-    deleteWorkdayBtn.addEventListener('click', function() {
-      workdayDiv.remove();
-    });
-    workdayDiv.appendChild(deleteWorkdayBtn);
-
-    // Button, um für diesen Tag eine neue Baustelle anzulegen
-    const addBaustelleBtn = document.createElement('button');
-    addBaustelleBtn.textContent = 'Baustelle hinzufügen';
-    addBaustelleBtn.classList.add('action-btn-grey', 'add-baustelle-btn');
-    workdayDiv.appendChild(addBaustelleBtn);
-
-    // Container für die Baustellen dieses Arbeitstags
-    const baustellenContainer = document.createElement('div');
-    baustellenContainer.classList.add('baustellen-container');
-    workdayDiv.appendChild(baustellenContainer);
-
-    // Event: Beim Klick auf den Button wird eine neue Baustelle hinzugefügt
-    addBaustelleBtn.addEventListener('click', function() {
-      addBaustelle(baustellenContainer);
-    });
-
-    // Füge den neuen Arbeitstag dem Hauptcontainer hinzu
-    workdaysContainer.appendChild(workdayDiv);
-  }
-
-  // Funktion: Neue Baustelle in den übergebenen Container hinzufügen
-  function addBaustelle(container) {
-    const baustelleDiv = document.createElement('div');
-    baustelleDiv.classList.add('baustelle');
-
-    // Eingabefeld für den Baustellennamen
-    const nameLabel = document.createElement('label');
-    nameLabel.textContent = 'Baustelle:';
-    const nameInput = document.createElement('input');
-    nameInput.type = 'text';
-    nameInput.placeholder = 'Name der Baustelle';
-    nameInput.classList.add('baustelle-name');
-    nameLabel.appendChild(nameInput);
-    baustelleDiv.appendChild(nameLabel);
-
-    // Eingabefeld für die Arbeitszeit
-    const arbeitszeitLabel = document.createElement('label');
-    arbeitszeitLabel.textContent = 'Arbeitszeit (h):';
-    const arbeitszeitInput = document.createElement('input');
-    arbeitszeitInput.type = 'number';
-    arbeitszeitInput.placeholder = 'Stunden';
-    arbeitszeitInput.min = "0";
-    arbeitszeitInput.step = "0.1";
-    arbeitszeitInput.classList.add('baustelle-arbeitszeit');
-    arbeitszeitLabel.appendChild(arbeitszeitInput);
-    baustelleDiv.appendChild(arbeitszeitLabel);
-
-    // Löschen-Button für die Baustelle
-    const deleteBaustelleBtn = document.createElement('button');
-    deleteBaustelleBtn.textContent = 'Baustelle löschen';
-    deleteBaustelleBtn.classList.add('delete-btn');
-    deleteBaustelleBtn.addEventListener('click', function() {
-      baustelleDiv.remove();
-    });
-    baustelleDiv.appendChild(deleteBaustelleBtn);
-
-    // Füge den Baustellen-Eintrag in den Container ein
-    container.appendChild(baustelleDiv);
-  }
-
   // Funktion: Erstelle ein PDF aus den eingetragenen Daten und teile es
   async function generatePDF() {
     // Hole den Nutzernamen
@@ -213,6 +107,112 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 });
+
+// Funktion: Neuen Arbeitstag erstellen
+function addWorkday() {
+  // Container für den Arbeitstag
+  const workdayDiv = document.createElement('div');
+  workdayDiv.classList.add('workday');
+
+  // Datumseingabe für den Arbeitstag
+  const dateLabel = document.createElement('label');
+  dateLabel.textContent = 'Datum:';
+  const dateInput = document.createElement('input');
+  dateInput.type = 'date';
+  dateInput.classList.add('workday-date');
+  dateLabel.appendChild(dateInput);
+  workdayDiv.appendChild(dateLabel);
+
+  // Pauseneingabe pro Arbeitstag
+  const pausenLabel = document.createElement('label');
+  pausenLabel.textContent = 'Pausen (Min):';
+  const pausenInput = document.createElement('input');
+  pausenInput.type = 'number';
+  pausenInput.placeholder = 'Minuten';
+  pausenInput.min = "0";
+  pausenInput.classList.add('workday-pausen');
+  pausenLabel.appendChild(pausenInput);
+  workdayDiv.appendChild(pausenLabel);
+
+  // Fahrtzeit pro Arbeitstag
+  const fahrtzeitLabel = document.createElement('label');
+  fahrtzeitLabel.textContent = 'Fahrtzeit (Min):';
+  const fahrtzeitInput = document.createElement('input');
+  fahrtzeitInput.type = 'number';
+  fahrtzeitInput.placeholder = 'Minuten';
+  fahrtzeitInput.min = "0";
+  fahrtzeitInput.classList.add('workday-fahrtzeit');
+  fahrtzeitLabel.appendChild(fahrtzeitInput)
+  workdayDiv.appendChild(fahrtzeitLabel);
+
+  // Löschen-Button für den Arbeitstag
+  const deleteWorkdayBtn = document.createElement('button');
+  deleteWorkdayBtn.textContent = 'Arbeitstag löschen';
+  deleteWorkdayBtn.classList.add('delete-btn');
+  deleteWorkdayBtn.addEventListener('click', function() {
+    workdayDiv.remove();
+  });
+  workdayDiv.appendChild(deleteWorkdayBtn);
+
+  // Button, um für diesen Tag eine neue Baustelle anzulegen
+  const addBaustelleBtn = document.createElement('button');
+  addBaustelleBtn.textContent = 'Baustelle hinzufügen';
+  addBaustelleBtn.classList.add('action-btn-grey', 'add-baustelle-btn');
+  workdayDiv.appendChild(addBaustelleBtn);
+
+  // Container für die Baustellen dieses Arbeitstags
+  const baustellenContainer = document.createElement('div');
+  baustellenContainer.classList.add('baustellen-container');
+  workdayDiv.appendChild(baustellenContainer);
+
+  // Event: Beim Klick auf den Button wird eine neue Baustelle hinzugefügt
+  addBaustelleBtn.addEventListener('click', function() {
+    addBaustelle(baustellenContainer);
+  });
+
+  // Füge den neuen Arbeitstag dem Hauptcontainer hinzu
+  workdaysContainer.appendChild(workdayDiv);
+}
+
+// Funktion: Neue Baustelle in den übergebenen Container hinzufügen
+function addBaustelle(container) {
+  const baustelleDiv = document.createElement('div');
+  baustelleDiv.classList.add('baustelle');
+
+  // Eingabefeld für den Baustellennamen
+  const nameLabel = document.createElement('label');
+  nameLabel.textContent = 'Baustelle:';
+  const nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.placeholder = 'Name der Baustelle';
+  nameInput.classList.add('baustelle-name');
+  nameLabel.appendChild(nameInput);
+  baustelleDiv.appendChild(nameLabel);
+
+  // Eingabefeld für die Arbeitszeit
+  const arbeitszeitLabel = document.createElement('label');
+  arbeitszeitLabel.textContent = 'Arbeitszeit (h):';
+  const arbeitszeitInput = document.createElement('input');
+  arbeitszeitInput.type = 'number';
+  arbeitszeitInput.placeholder = 'Stunden';
+  arbeitszeitInput.min = "0";
+  arbeitszeitInput.step = "0.1";
+  arbeitszeitInput.classList.add('baustelle-arbeitszeit');
+  arbeitszeitLabel.appendChild(arbeitszeitInput);
+  baustelleDiv.appendChild(arbeitszeitLabel);
+
+  // Löschen-Button für die Baustelle
+  const deleteBaustelleBtn = document.createElement('button');
+  deleteBaustelleBtn.textContent = 'Baustelle löschen';
+  deleteBaustelleBtn.classList.add('delete-btn');
+  deleteBaustelleBtn.addEventListener('click', function() {
+    baustelleDiv.remove();
+  });
+  baustelleDiv.appendChild(deleteBaustelleBtn);
+
+  // Füge den Baustellen-Eintrag in den Container ein
+  container.appendChild(baustelleDiv);
+}
 
 // Funktion, um den aktuellen Zustand zu speichern
 function saveState() {
@@ -311,7 +311,7 @@ function loadState() {
     // Button zum Hinzufügen einer Baustelle
     const addBaustelleBtn = document.createElement('button');
     addBaustelleBtn.textContent = 'Baustelle hinzufügen';
-    addBaustelleBtn.classList.add('action-btn', 'add-baustelle-btn');
+    addBaustelleBtn.classList.add('action-btn-grey', 'add-baustelle-btn');
     workdayDiv.appendChild(addBaustelleBtn);
     
     // Container für Baustellen
