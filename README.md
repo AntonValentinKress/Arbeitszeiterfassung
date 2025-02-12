@@ -11,8 +11,8 @@ Der Nutzer kann **Arbeitstage** und **Baustellen** einpflegen:
 
 - **Arbeitstag**
   - Datum (im Format `dd.mm.yyyy`)
-  - Pausenzeit (in Minuten)
-  - Fahrtzeit (in Minuten)
+  - Pausenzeit (in Stunden)
+  - Fahrtzeit (in Stunden)
 - **Baustelle**
   - Name der Baustelle
   - Arbeitszeit (in Stunden)
