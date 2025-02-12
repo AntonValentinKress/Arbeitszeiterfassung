@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Überschrift pro Arbeitstag
       doc.setFontSize(12);
-      doc.text(`${weekdayDateVal} (${formattedDateVal}): Pausen: ${pausenVal} Min | Fahrtzeit: ${fahrtzeitVal} Min`, 10, y);
+      doc.text(`${weekdayDateVal} (${formattedDateVal}): Pausen: ${pausenVal} Std. | Fahrtzeit: ${fahrtzeitVal} Std.`, 10, y);
       y += 6;
 
       // Alle Baustellen dieses Tages
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
       baustellen.forEach((baustelle) => {
         const baustelleName = baustelle.querySelector('.baustelle-name').value || 'Keine Angabe';
         const arbeitszeit = baustelle.querySelector('.baustelle-arbeitszeit').value || '0';
-        tableRows.push([baustelleName, arbeitszeit + ' h']);
+        tableRows.push([baustelleName, arbeitszeit + ' Std.']);
       });
       if (tableRows.length === 0) {
         tableRows.push(['Keine Baustelle', '']);
@@ -135,10 +135,10 @@ function addWorkday(collapsed = false) {
 
   // Pauseneingabe
   const pausenLabel = document.createElement('label');
-  pausenLabel.textContent = 'Pausen (Min):';
+  pausenLabel.textContent = 'Pausen (Std.):';
   const pausenInput = document.createElement('input');
   pausenInput.type = 'number';
-  pausenInput.placeholder = 'Minuten';
+  pausenInput.placeholder = 'Stunden';
   pausenInput.min = "0";
   pausenInput.classList.add('workday-pausen');
   pausenLabel.appendChild(pausenInput);
@@ -146,10 +146,10 @@ function addWorkday(collapsed = false) {
 
   // Fahrtzeiteingabe
   const fahrtzeitLabel = document.createElement('label');
-  fahrtzeitLabel.textContent = 'Fahrtzeit (Min):';
+  fahrtzeitLabel.textContent = 'Fahrtzeit (Std.):';
   const fahrtzeitInput = document.createElement('input');
   fahrtzeitInput.type = 'number';
-  fahrtzeitInput.placeholder = 'Minuten';
+  fahrtzeitInput.placeholder = 'Stunden';
   fahrtzeitInput.min = "0";
   fahrtzeitInput.classList.add('workday-fahrtzeit');
   fahrtzeitLabel.appendChild(fahrtzeitInput);
@@ -213,7 +213,7 @@ function addBaustelle(container) {
   baustelleDiv.appendChild(nameLabel);
 
   const arbeitszeitLabel = document.createElement('label');
-  arbeitszeitLabel.textContent = 'Arbeitszeit (h):';
+  arbeitszeitLabel.textContent = 'Arbeitszeit (Std.):';
   const arbeitszeitInput = document.createElement('input');
   arbeitszeitInput.type = 'number';
   arbeitszeitInput.placeholder = 'Stunden';
@@ -340,10 +340,10 @@ function loadState() {
 
     // Pauseneingabe
     const pausenLabel = document.createElement('label');
-    pausenLabel.textContent = 'Pausen (Min):';
+    pausenLabel.textContent = 'Pausen (Std.):';
     const pausenInput = document.createElement('input');
     pausenInput.type = 'number';
-    pausenInput.placeholder = 'Minuten';
+    pausenInput.placeholder = 'Stunden';
     pausenInput.min = "0";
     pausenInput.classList.add('workday-pausen');
     pausenInput.value = day.pausen;
@@ -352,10 +352,10 @@ function loadState() {
 
     // Fahrtzeiteingabe
     const fahrtzeitLabel = document.createElement('label');
-    fahrtzeitLabel.textContent = 'Fahrtzeit (Min):';
+    fahrtzeitLabel.textContent = 'Fahrtzeit (Std.):';
     const fahrtzeitInput = document.createElement('input');
     fahrtzeitInput.type = 'number';
-    fahrtzeitInput.placeholder = 'Minuten';
+    fahrtzeitInput.placeholder = 'Stunden';
     fahrtzeitInput.min = "0";
     fahrtzeitInput.classList.add('workday-fahrtzeit');
     fahrtzeitInput.value = day.fahrtzeit;
@@ -402,7 +402,7 @@ function loadState() {
       baustelleDiv.appendChild(nameLabel);
 
       const arbeitszeitLabel = document.createElement('label');
-      arbeitszeitLabel.textContent = 'Arbeitszeit (h):';
+      arbeitszeitLabel.textContent = 'Arbeitszeit (Std.):';
       const arbeitszeitInput = document.createElement('input');
       arbeitszeitInput.type = 'number';
       arbeitszeitInput.placeholder = 'Stunden';
