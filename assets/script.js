@@ -30,64 +30,98 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Alle Arbeitstage durchgehen
     const workdayDivs = document.querySelectorAll('.workday');
+    let weeklyTotal = 0; // Gesamte Wochenarbeitszeit
 
     if (workdayDivs.length === 0) {
-      doc.text('Keine Daten vorhanden.', 10, y);
+        doc.text('Keine Daten vorhanden.', 10, y);
     }
 
     workdayDivs.forEach((workday) => {
-      // Hole Datum und Pausen-/Fahrtzeiten aus dem Inhalt (workday-content)
-      const dateVal = workday.querySelector('.workday-date').value || 'Kein Datum';
-      const pausenVal = workday.querySelector('.workday-pausen').value || '0';
-      const fahrtzeitVal = workday.querySelector('.workday-fahrtzeit').value || '0';
+        const dateVal = workday.querySelector('.workday-date').value || 'Kein Datum';
+        const pausenVal = parseFloat(workday.querySelector('.workday-pausen').value) || 0;
+        const fahrtzeitVal = parseFloat(workday.querySelector('.workday-fahrtzeit').value) || 0;
 
-      let formattedDateVal = formatDate(dateVal);
-      let weekdayDateVal = weekdayDate(dateVal);
+        let formattedDateVal = formatDate(dateVal);
+        let weekdayDateVal = weekdayDate(dateVal);
 
-      // Überschrift pro Arbeitstag
-      doc.setFontSize(12);
-      doc.text(`${weekdayDateVal} (${formattedDateVal}): Pausen: ${pausenVal} Std. | Fahrtzeit: ${fahrtzeitVal} Std.`, 10, y);
-      y += 6;
+        // Überschrift pro Arbeitstag
+        doc.setFontSize(12);
+        doc.text(`${weekdayDateVal} (${formattedDateVal}):`, 10, y);
+        doc.text(`Pausen: ${pausenVal} Std. | Fahrtzeit: ${fahrtzeitVal} Std.`, 75, y)
 
-      // Alle Baustellen dieses Tages
-      const baustellen = workday.querySelectorAll('.baustelle');
-      const tableRows = [];
-      baustellen.forEach((baustelle) => {
-        const baustelleName = baustelle.querySelector('.baustelle-name').value || 'Keine Angabe';
-        const arbeitszeit = baustelle.querySelector('.baustelle-arbeitszeit').value || '0';
-        tableRows.push([baustelleName, arbeitszeit + ' Std.']);
-      });
-      if (tableRows.length === 0) {
-        tableRows.push(['Keine Baustelle', '']);
-      }
-      doc.autoTable({
+        y += 6;
+
+        // Alle Baustellen dieses Tages
+        const baustellen = workday.querySelectorAll('.baustelle');
+        const tableRows = [];
+        let dailyTotal = 0; // Gesamtarbeitszeit pro Tag
+
+        baustellen.forEach((baustelle) => {
+            const baustelleName = baustelle.querySelector('.baustelle-name').value || 'Keine Angabe';
+            const arbeitszeit = parseFloat(baustelle.querySelector('.baustelle-arbeitszeit').value) || 0;
+            dailyTotal += arbeitszeit;
+            tableRows.push([baustelleName, arbeitszeit.toFixed(1) + ' Std.']);
+        });
+
+        if (tableRows.length === 0) {
+            tableRows.push(['Keine Baustelle', '0 Std.']);
+        }
+
+        // Summenzeile pro Tag
+        tableRows.push(['Summe', dailyTotal.toFixed(1) + ' Std.']);
+        weeklyTotal += dailyTotal;
+
+        doc.autoTable({
+            startY: y,
+            head: [['Baustelle', 'Arbeitszeit']],
+            body: tableRows,
+            theme: 'grid',
+            styles: { fontSize: 10 },
+            headStyles: { fillColor: [39, 174, 96] },
+            didParseCell: function (data) {
+                if (data.row.index === tableRows.length - 1) {
+                    data.cell.styles.fontStyle = 'bold';
+                    data.cell.styles.halign = 'right';
+                    data.cell.styles.textColor = [253, 151, 31]; // Orange für Summe
+                }
+            }
+        });
+
+        y = doc.lastAutoTable.finalY + 10;
+    });
+
+    //Trennlinie
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.line(10,y,200,y);
+    y+=5;
+
+    // Gesamtsumme für die Woche
+    doc.autoTable({
         startY: y,
-        head: [['Baustelle', 'Arbeitszeit']],
-        body: tableRows,
-        theme: 'grid',
-        styles: { fontSize: 10 },
-        headStyles: { fillColor: [39, 174, 96] }
-      });
-      y = doc.lastAutoTable.finalY + 10;
+        body: [['Gesamte Wochenarbeitszeit', weeklyTotal.toFixed(1) + ' Std.']],
+        theme: 'plain',
+        styles: { halign: 'right', fontStyle: 'bold', textColor: [253, 151, 31] },
     });
 
     // PDF-Blob erstellen
     const pdfBlob = doc.output('blob');
 
     if (navigator.canShare && navigator.canShare({ files: [new File([pdfBlob], 'arbeitszeiterfassung.pdf', { type: 'application/pdf' })] })) {
-      try {
-        await navigator.share({
-          files: [new File([pdfBlob], 'arbeitszeiterfassung.pdf', { type: 'application/pdf' })],
-          title: 'Arbeitszeiterfassung',
-          text: 'Hier ist meine Arbeitszeiterfassung als PDF.'
-        });
-      } catch (error) {
-        console.error('Teilen fehlgeschlagen:', error);
-      }
+        try {
+            await navigator.share({
+                files: [new File([pdfBlob], 'arbeitszeiterfassung.pdf', { type: 'application/pdf' })],
+                title: 'Arbeitszeiterfassung',
+                text: 'Hier ist meine Arbeitszeiterfassung als PDF.'
+            });
+        } catch (error) {
+            console.error('Teilen fehlgeschlagen:', error);
+        }
     } else {
-      doc.save('arbeitszeiterfassung.pdf');
+        doc.save('arbeitszeiterfassung.pdf');
     }
-  }
+}
+
 });
 
 // Funktion: Neuen Arbeitstag erstellen
